@@ -1,5 +1,6 @@
 let sodium = null;
 const key_length = 32;
+const X25519_KEY_LEN = 32;
 
 const opsLimit = 4;
 const memLimit = 88 * 1000 * 1000; //
@@ -25,7 +26,25 @@ export function getBaseKey(username, password){
     logConstants();
     
     const salt = sodium.crypto_generichash(sodium.crypto_pwhash_SALTBYTES, username+password+constantWords[2],null);
-    return sodium.crypto_pwhash(key_length, password, salt, opsLimit, memLimit ,sodium.crypto_pwhash_ALG_ARGON2ID13);
-
-    
+    return sodium.crypto_pwhash(key_length, password, salt, opsLimit, memLimit ,sodium.crypto_pwhash_ALG_ARGON2ID13);    
+}
+/**  you should only ever need to use the `meskey` and `pubkey`. send `pubkey` with message, and encrypt message with `meskey`.
+ * @param recipientPubkey the public key of the person your sending the message to.
+ * @returns a js object contaning the public, private(secret), and exchanged keys to use to send a message: `{pubkey, seckey, meskey}`. `meskey` is the sharedsecret used to send the message
+ * 
+ * */
+export function createMessageKeypair(recipientPubkey){
+    const seckey=sodium.randombytes_buf(X25519_KEY_LEN);
+    const pubkey=sodium.crypto_scalarmult_base(seckey);
+    const meskey=sodium.crypto_scalarmult(seckey,recipientPubkey);
+    return {seckey:seckey,pubkey:pubkey,meskey:meskey};
+}
+/**
+ * 
+ * @returns a js object `{pubkey,seckey}` public key and private key, respectively.
+ */
+export function createKeypair(){
+    const seckey=sodium.randombytes_buf(X25519_KEY_LEN);
+    const pubkey=sodium.crypto_scalarmult_base(seckey);
+    return {pubkey:pubkey,seckey:seckey};
 }
