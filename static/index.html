@@ -28,7 +28,7 @@
           <span>Password:</span>
           <input type="password" placeholder="password" id="signin-password">
         </div>
-        <button onclick="signin()">Sign In</button>
+        <button id="signin-button">Sign In</button>
         <hr>
         <h2>Sign up</h2>
 
@@ -41,12 +41,12 @@
           <span>Password:</span>
           <input type="password" placeholder="password" id="signup-password">
         </div>
-        <button onclick="signup()">Sign Up</button>
+        <button id="signup-button">Sign Up</button>
         
         <div style="position: fixed; bottom: 0; right: 5px; padding: 5px; border: 1px red none; width: 500px; gap:10px;" id="alerts"></div>
     </body>
 
     
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
   <script src="sodium.js" async></script>
 </html>
