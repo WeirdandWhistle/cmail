@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            .form-group {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+             .form-group span {
+                width: 150px; 
+                font-weight: bold;
+            }
+</style>
+    </head>
+
+    <body>
+        <h2>Sign in</h2>
+
+        <div class="form-group">
+          <span>Handle/username:</span>
+          <input type="text" placeholder="@user1" id="signin-username">
+        </div>
+
+        <div class="form-group">
+          <span>Password:</span>
+          <input type="password" placeholder="password" id="signin-password">
+        </div>
+        <button id="signin-button">Sign In</button>
+        <hr>
+        <h2>Sign up</h2>
+
+        <div class="form-group">
+          <span>Handle/username:</span>
+          <input type="text" placeholder="@user1" id="signup-username">
+        </div>
+
+        <div class="form-group">
+          <span>Password:</span>
+          <input type="password" placeholder="password" id="signup-password">
+        </div>
+        <button id="signup-button">Sign Up</button>
+        
+        <div style="position: fixed; bottom: 0; right: 5px; padding: 5px; border: 1px red none; width: 500px; gap:10px;" id="alerts"></div>
+    </body>
+
+    
+  <script type="module" src="app.js"></script>
+  <script src="../sodium.js" async></script>
+</html>

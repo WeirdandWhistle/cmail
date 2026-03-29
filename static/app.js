@@ -1,4 +1,4 @@
-import * as crypto from './crypto.js';
+import * as crypto from '../crypto.js';
 
 let sodium;
 window.sodium = {
@@ -9,12 +9,6 @@ window.sodium = {
     }
 };
 
-const signin_password = document.getElementById("signin-password");
-const signin_username = document.getElementById("signin-username");
-const signin_button = document.getElementById("signin-button");
-const signup_password = document.getElementById("signup-password");
-const signup_username = document.getElementById("signup-username");
-const signup_button = document.getElementById("signup-button");
 const alerts = document.getElementById("alerts");
 
 async function main(){
@@ -34,27 +28,4 @@ function alert(text,color){
     alerts.insertAdjacentHTML("afterbegin",element);
 
     setTimeout(()=>{document.getElementById(`alert-${count}`).remove();},alertTime*1000);
-}
-
-signin_button.addEventListener("click",signin);
-function signin(){
-    alert("for no reason","green");
-}
-
-signup_button.addEventListener("click",signup);
-function signup(){
-    const username = signup_username.value;
-    const password = signup_password.value;
-    
-    const start = window.performance.now();
-    const baseKey = crypto.getBaseKey(username,password);
-    const end= window.performance.now();
-
-    let dif = end -start;
-
-    dif /= 1000;
-
-    console.log("baseKey Calculation took",dif,"seconds");
-
-    console.log("baseKey:",baseKey);
 }
