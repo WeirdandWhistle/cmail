@@ -22,6 +22,8 @@ async function main(){
     console.log("from main",sodium.to_hex(sodium.crypto_hash_sha256("test")));
     console.log("sodium loaded and ready to go!");
     crypto.init(sodium);
+
+    console.log("sign keypair",crypto.createEd25519Keypair());
 }
 
 let count = 1;
