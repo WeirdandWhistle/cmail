@@ -37,6 +37,21 @@ const memLimit = 88 * 1000 * 1000;
      but should at least put a big red box over the message, and should proably not render it at all and report the incedent to the user
 */
 
+/* payload for account entry
+    addition data {
+        [24 bytes] nouce +
+        [32 bytes] public key (Ed25519) +
+        [2 bytes] usernameLength (how many bytes until the start if cipher text) (big edian order) +
+        [n bytes] username
+    }
+    +
+    cipherText {
+        [32 bytes] private key (Ed25519)
+    }
+    +
+    authentication tag for chacha20-poly1305
+*/
+
 const constantWords = ["Just ask for the regular! The regular is a HAM and CHEESE!",
     "would you like to purchase some extened warranty?",
     "Hello. my name is emigo-montoy0. you killed my father. prepare to die.",
@@ -119,6 +134,23 @@ export function encryptMessage(payload,username,messageKeypair,signingKey,signin
     const message = `{"payload":${payload},"username":"${username}","publicKey":"${signingPublicKeyBase64}","signature":"${signatureBase64}"}`;
     
     const encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(message,addtionalData,null,nouce,messageKeypair.messageKey);
+
+    return addtionalData.concat(encrypted);
+}
+
+export function generateAccountVault(vaultKey,publicKey,privateKey,username){
+    loaded();
+    const nouce = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
+
+    const buffer = new ArrayBuffer(2);
+    const view = new DataView(buffer);
+    view.setUint16(0,username.length,false);
+    const usernameLength = new Uint8Array(buffer); 
+    const usernameArray = sodium.from_string(username);
+
+    const addtionalData = nouce.concat(publicKey,usernameLength,usernameArray);
+
+    const encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(privateKey,addtionalData,null,nouce,vaultKey);
 
     return addtionalData.concat(encrypted);
 }
