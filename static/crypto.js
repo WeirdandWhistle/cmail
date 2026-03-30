@@ -53,7 +53,7 @@ const memLimit = 88 * 1000 * 1000;
 */
 
 const constantWords = ["Just ask for the regular! The regular is a HAM and CHEESE!",
-    "would you like to purchase some extened warranty?",
+    "Who do you see? Who do you think your talking to? Someone opens the door and gets shot, you think that of me? I am not in danger. I am the danger! I AM THE ONE WHO KNOCKS!",
     "Hello. my name is emigo-montoy0. you killed my father. prepare to die.",
     "1234? thats the password an idiot would put on his luggage!",
     "When life gives you lemons, DONT MAKE LEMONADE! Make life take the lemons back! GET MAD! I DONT WANT YOUR DAMM LEMONS! Demand to see lifes manager!"];
