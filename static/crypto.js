@@ -137,7 +137,13 @@ export function encryptMessage(payload,username,messageKeypair,signingKey,signin
 
     return addtionalData.concat(encrypted);
 }
-
+/**
+ * @param {Uint8Array} vaultKey using to encrypt the private key payload. derived from the key schelue (smilar to TLS1.3).
+ * @param {Uint8Array} publicKey a Ed25519 public key used for signging and encryption.
+ * @param {Uint8Array} privateKey a Ed25519 private key mathmaticly linked to the public key. used for signing.
+ * @param {String} username a string of the `username` of the sender! Woah who could have guessed?
+ * @returns a `Uint8Array` conating the additionData + the cipherText + the authenication tag. this is what is store in a database entry.
+ */
 export function generateAccountVault(vaultKey,publicKey,privateKey,username){
     loaded();
     const nouce = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
@@ -153,4 +159,30 @@ export function generateAccountVault(vaultKey,publicKey,privateKey,username){
     const encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(privateKey,addtionalData,null,nouce,vaultKey);
 
     return addtionalData.concat(encrypted);
+}
+/**
+ * psss.
+ * hey you!
+ * yeah...
+ * you...
+ * guess what?
+ * I made TLS. You hear that?
+ *
+ ```text
+/$$$$$$       /$$      /$$  /$$$$$$  /$$$$$$$  /$$$$$$$$       /$$$$$$$$ /$$        /$$$$$$    /$$        /$$$$$$   /$$
+|_  $$_/      | $$$    /$$$ /$$__  $$| $$__  $$| $$_____/      |__  $$__/| $$       /$$__  $$ /$$$$       /$$__  $$| $$
+--| $$        | $$$$  /$$$$| $$  \ $$| $$  \ $$| $$               | $$   | $$      | $$  \__/|_  $$      |__/  \ $$| $$
+--| $$        | $$ $$/$$ $$| $$$$$$$$| $$  | $$| $$$$$            | $$   | $$      |  $$$$$$   | $$         /$$$$$/| $$
+--| $$        | $$  $$$| $$| $$__  $$| $$  | $$| $$__/            | $$   | $$       \____  $$  | $$        |___  $$|__/
+--| $$        | $$\  $ | $$| $$  | $$| $$  | $$| $$               | $$   | $$       /$$  \ $$  | $$       /$$  \ $$    
+-/$$$$$$      | $$ \/  | $$| $$  | $$| $$$$$$$/| $$$$$$$$         | $$   | $$$$$$$$|  $$$$$$/ /$$$$$$ /$$|  $$$$$$/ /$$
+|______/      |__/     |__/|__/  |__/|_______/ |________/         |__/   |________/ \______/ |______/|__/ \______/ |__/
+```
+ * @param {Uint8Array} baseKey this is derived from `getBaseKey()`. this is gotten from the password + username scrable. everything is based from this key.
+ * @returns {JsonObject} this function returns a big json object of mostly if not all `Uint8Array`s that have various uses for encryption and decryption.
+ */
+export function keySchedlue(baseKey){
+    let out = {};
+
+    return out;
 }
