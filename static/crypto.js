@@ -1,6 +1,7 @@
 let sodium = null;
 const key_length = 32;
 const X25519_KEY_LEN = 32;
+const ctx_length = 8;
 
 // opsLimit and memLimit are client dependent BUT should always be the same, and I reccomend useing the same as other clients, for consitancy.
 const opsLimit = 4;
@@ -181,8 +182,13 @@ export function generateAccountVault(vaultKey,publicKey,privateKey,username){
  * @param {Uint8Array} baseKey this is derived from `getBaseKey()`. this is gotten from the password + username scrable. everything is based from this key.
  * @returns {JsonObject} this function returns a big json object of mostly if not all `Uint8Array`s that have various uses for encryption and decryption.
  */
-export function keySchedlue(baseKey){
+export function keySchedule(baseKey){
+    loaded();
     let out = {};
+
+    const vaultKey = sodium.crypto_kdf_derive_from_key(key_length,1,"vaultKey",baseKey);
+
+    out.vaultKey = vaultKey;
 
     return out;
 }

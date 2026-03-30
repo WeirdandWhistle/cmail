@@ -7,7 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class Router {
 
     @GetMapping({"/ooh","/ooh/"})
-    public String forwardToOoh() {
+    public String forwardToOoh(){
         return "forward:/ooh/index.html";
+    } 
+    @GetMapping({"/login","/login/"})
+    public String forwardToLogin(){
+        return "forward:/login/index.html";
     }
 }

@@ -1,4 +1,4 @@
-import * as crypto from '../crypto.js';
+import * as crypto from './crypto.js';
 
 let sodium;
 window.sodium = {
