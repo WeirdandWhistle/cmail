@@ -43,7 +43,8 @@ const memLimit = 88 * 1000 * 1000;
         [24 bytes] nouce +
         [32 bytes] public key (Ed25519) +
         [2 bytes] usernameLength (how many bytes until the start if cipher text) (big edian order) +
-        [n bytes] username
+        [n bytes] username +
+        [2 bytes] cipherText length (how many byte until end of message) (big edian order)
     }
     +
     cipherText {
