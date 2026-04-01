@@ -1,22 +1,35 @@
 package net.whynotjava.cmail.cmail;
 
 import net.whynotjava.cmail.*;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.*;
+
+import java.io.IOException;
 import java.sql.*;
+
+import jakarta.servlet.http.*;
 
 @RestController
 @RequestMapping("/cmail")
 public class CMail{
 
-    private static String var = Main.DB_URL;
-
     @Autowired
     private Database dbService;
+
+    private CreateAccount accountCreator;
+
+    public CMail(){
+        this.accountCreator = new CreateAccount(dbService);
+    }
 
     @RequestMapping({"","/"})
     public String base(){
         return "OK";
+    }
+    @PostMapping("/account/create")
+    public String createAccount(HttpServletRequest req) throws IOException{
+        return accountCreator.parseAndRegisterAccount(req);
     }
 
     // @RequestMapping("/account")

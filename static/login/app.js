@@ -17,6 +17,8 @@ const signup_username = document.getElementById("signup-username");
 const signup_button = document.getElementById("signup-button");
 const alerts = document.getElementById("alerts");
 
+let keys = null;
+
 async function main(){
     await sodium.ready;
     console.log("from main",sodium.to_hex(sodium.crypto_hash_sha256("test")));
@@ -42,7 +44,8 @@ function signin(){
 }
 
 signup_button.addEventListener("click",signup);
-function signup(){
+async function signup(){
+    console.log("starting sign up sequence!");
     const username = signup_username.value;
     const password = signup_password.value;
     
@@ -55,6 +58,18 @@ function signup(){
     dif /= 1000;
 
     console.log("baseKey Calculation took",dif,"seconds");
-
     console.log("baseKey:",baseKey);
+
+    keys = crypto.keySchedule(baseKey);
+
+    const idKeys = crypto.createEd25519Keypair();
+
+    const accountVault = crypto.generateAccountVault(keys.vaultKey,idKeys.publicKey,idKeys.privateKey,username);
+
+    console.log("accountVault",accountVault);
+
+    await fetch("/cmail/account/create",{
+        method: 'POST',
+        body:accountVault,
+    });
 }

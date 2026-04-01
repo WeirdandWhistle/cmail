@@ -156,11 +156,12 @@ export function generateAccountVault(vaultKey,publicKey,privateKey,username){
     const usernameLength = new Uint8Array(buffer); 
     const usernameArray = sodium.from_string(username);
 
-    const addtionalData = nouce.concat(publicKey,usernameLength,usernameArray);
+    console.log("nouce",nouce);
+    const addtionalData = concatArr(nouce,publicKey,usernameLength,usernameArray);
 
     const encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(privateKey,addtionalData,null,nouce,vaultKey);
 
-    return addtionalData.concat(encrypted);
+    return concatArr(addtionalData,encrypted);
 }
 /**
  * psss.
@@ -192,4 +193,15 @@ export function keySchedule(baseKey){
     out.vaultKey = vaultKey;
 
     return out;
+}
+
+function concatArr(...arrays) {
+  const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const arr of arrays) {
+    result.set(arr, offset);
+    offset += arr.length;
+  }  
+  return result;
 }

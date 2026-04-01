@@ -10,8 +10,12 @@ public class Router {
     public String forwardToOoh(){
         return "forward:/ooh/index.html";
     } 
-    @GetMapping({"/login","/login/"})
+    @GetMapping({"/login/"})
     public String forwardToLogin(){
         return "forward:/login/index.html";
+    }
+    @GetMapping("/login")
+    public String redirectToLogin(){
+        return "redirect:/login/";
     }
 }
