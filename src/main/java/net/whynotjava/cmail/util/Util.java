@@ -18,4 +18,10 @@ public abstract class Util {
         }
         return new String(chars);
     }
+    public static String generateJsonError(String error, String error_message){
+        return "{\"ok\":false,\"error\":\""+error+"\",\"error_message\":\""+error_message+"\"}";
+    }
+    public static String generateJsonError(String error){
+        return generateJsonError(error,"");
+    }
 }

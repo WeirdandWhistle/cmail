@@ -1,12 +1,15 @@
 package net.whynotjava.cmail.cmail;
 
 import net.whynotjava.cmail.*;
+import net.whynotjava.cmail.util.Util;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.*;
 
 import java.io.IOException;
 import java.sql.*;
+
+import org.springframework.http.*;
 
 import jakarta.servlet.http.*;
 
@@ -19,7 +22,8 @@ public class CMail{
 
     private CreateAccount accountCreator;
 
-    public CMail(){
+    @Autowired
+    public CMail(Database dbService){
         this.accountCreator = new CreateAccount(dbService);
     }
 
@@ -28,8 +32,12 @@ public class CMail{
         return "OK";
     }
     @PostMapping("/account/create")
-    public String createAccount(HttpServletRequest req) throws IOException{
-        return accountCreator.parseAndRegisterAccount(req);
+    public ResponseEntity<?> createAccount(HttpServletRequest req){
+        try {
+            return accountCreator.parseAndRegisterAccount(req);
+        } catch (IOException e) {
+            return new ResponseEntity<>(Util.generateJsonError("IOException",e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // @RequestMapping("/account")

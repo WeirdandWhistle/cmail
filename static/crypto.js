@@ -5,7 +5,7 @@ const ctx_length = 8;
 
 // opsLimit and memLimit are client dependent BUT should always be the same, and I reccomend useing the same as other clients, for consitancy.
 const opsLimit = 4;
-const memLimit = 88 * 1000 * 1000; 
+const memLimit = 128 * 1000 * 1000; 
 
 /* addtional data for message objects:
     [24 bytes] nouce +
