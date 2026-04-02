@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.*;
 import java.io.IOException;
 import java.sql.*;
 
+import org.apache.catalina.connector.*;
 import org.springframework.http.*;
 
 import jakarta.servlet.http.*;
@@ -35,6 +36,14 @@ public class CMail{
     public ResponseEntity<?> createAccount(HttpServletRequest req){
         try {
             return accountCreator.parseAndRegisterAccount(req);
+        } catch (IOException e) {
+            return new ResponseEntity<>(Util.generateJsonError("IOException",e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/account/get")
+    public ResponseEntity<?> getAccount(HttpServletRequest req){
+        try {
+            return accountCreator.getAccountVault(req);
         } catch (IOException e) {
             return new ResponseEntity<>(Util.generateJsonError("IOException",e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }

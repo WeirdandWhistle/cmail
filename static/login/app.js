@@ -39,13 +39,29 @@ function alert(text,color){
 }
 
 signin_button.addEventListener("click",signin);
-function signin(){
-    alert("for no reason","green");
+async function signin(){
+    alert("Logging in!","green");
+
+    const username = signin_username.value;
+    const password = signin_password.value;
+    
+    const baseKey = crypto.getBaseKey(username,password);
+    //console.log("baseKey",baseKey);
+
+    const res = await fetch("/cmail/account/get",{
+        method:'POST',
+        body:JSON.stringify({username:username}),
+    });
+    let vault = await res.bytes();
+    keys = crypto.keySchedule(baseKey);
+    vault = crypto.decodeAccountVault(vault,keys.vaultKey);
+
+    console.log("stored private key",vault.privateKey);
 }
 
 signup_button.addEventListener("click",signup);
 async function signup(){
-    console.log("starting sign up sequence!");
+    //console.log("starting sign up sequence!");
     const username = signup_username.value;
     const password = signup_password.value;
     
@@ -53,23 +69,26 @@ async function signup(){
     const baseKey = crypto.getBaseKey(username,password);
     const end= window.performance.now();
 
-    let dif = end -start;
+    //console.log("baseKey",baseKey);
 
+    let dif = end-start;
     dif /= 1000;
-
-    console.log("baseKey Calculation took",dif,"seconds");
-    console.log("baseKey:",baseKey);
+    alert(`It took ${dif} seconds to create the baseKey!`,"yellow");
+    //console.log("baseKey Calculation took",dif,"seconds");
+    //console.log("baseKey:",baseKey);
 
     keys = crypto.keySchedule(baseKey);
 
     const idKeys = crypto.createEd25519Keypair();
+    console.log("created privateKey",idKeys.privateKey);
 
     const accountVault = crypto.generateAccountVault(keys.vaultKey,idKeys.publicKey,idKeys.privateKey,username);
 
-    console.log("accountVault",accountVault);
+    // console.log("accountVault",accountVault);
 
     await fetch("/cmail/account/create",{
         method: 'POST',
         body:accountVault,
     });
+    alert("Succseful Sign Up!","green");
 }

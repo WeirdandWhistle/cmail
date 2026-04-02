@@ -121,12 +121,10 @@ public class CreateAccount {
                 return new ResponseEntity<>(Util.generateJsonError("Both publicKey and username can be null"),HttpStatus.BAD_REQUEST);
             }
             byte vault[] = rs.getBytes(1);
-            return new ResponseEntity<>(vault,)
+            return new ResponseEntity<>(vault,HttpStatus.OK);
         } catch (SQLException e) {
             return new ResponseEntity<>(Util.generateJsonError("SQLException",e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return null;
     }
     
 }

@@ -1,11 +1,16 @@
 let sodium = null;
-const key_length = 32;
+const KEY_LENGTH = 32;
 const X25519_KEY_LEN = 32;
+const NOUCE_LENGTH = 24;
+const MAC_LENGTH = 16;
 const ctx_length = 8;
 
 // opsLimit and memLimit are client dependent BUT should always be the same, and I reccomend useing the same as other clients, for consitancy.
 const opsLimit = 4;
 const memLimit = 128 * 1000 * 1000; 
+
+let A;
+let B;
 
 /* addtional data for message objects:
     [24 bytes] nouce +
@@ -72,10 +77,10 @@ function logConstants(){
 }
 export function getBaseKey(username, password){
     loaded();
-    logConstants();
+    //logConstants();
     
     const salt = sodium.crypto_generichash(sodium.crypto_pwhash_SALTBYTES, username+password+constantWords[2],null);
-    return sodium.crypto_pwhash(key_length, password, salt, opsLimit, memLimit ,sodium.crypto_pwhash_ALG_ARGON2ID13);    
+    return sodium.crypto_pwhash(KEY_LENGTH, password, salt, opsLimit, memLimit ,sodium.crypto_pwhash_ALG_ARGON2ID13);    
 }
 /**  you should only ever need to use the `messageKey` and `publicKey`. send `publicKey` with message, and encrypt message with `messaegKey`.
  * @param recipientPubkey the public key of the person your sending the message to.
@@ -106,7 +111,9 @@ export function createX25519Keypair(){
  */
 export function createEd25519Keypair(){
     loaded();
-    return sodium.crypto_sign_keypair();
+    let out = sodium.crypto_sign_keypair();
+    out.privateKey = out.privateKey.slice(0,KEY_LENGTH);
+    return out;
 }
 
 /**
@@ -156,12 +163,69 @@ export function generateAccountVault(vaultKey,publicKey,privateKey,username){
     const usernameLength = new Uint8Array(buffer); 
     const usernameArray = sodium.from_string(username);
 
-    console.log("nouce",nouce);
-    const addtionalData = concatArr(nouce,publicKey,usernameLength,usernameArray);
+    // console.log("nouce",nouce);
+    const cipherTextLengthArr = setUint16(KEY_LENGTH+sodium.crypto_aead_xchacha20poly1305_ietf_ABYTES);
+    const addtionalData = concatArr(nouce,publicKey,usernameLength,usernameArray,cipherTextLengthArr);
+    const encryptedObject = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt_detached(privateKey,addtionalData,null,nouce,vaultKey);
+    const encrypted = encryptedObject.ciphertext;
+    console.log("encrypted with",vaultKey,"nouce",nouce,"additionalData",addtionalData,"A",encrypted);
+    A=encrypted;
+    return concatArr(addtionalData,encrypted,encryptedObject.mac);
+}
+export function decodeAccountVault(vault,vaultKey){
+    loaded();
+    let cursor = 0;
+    console.log("vault",vault);
 
-    const encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(privateKey,addtionalData,null,nouce,vaultKey);
+    const nouce = vault.slice(cursor,cursor+NOUCE_LENGTH);
+    cursor += NOUCE_LENGTH;
 
-    return concatArr(addtionalData,encrypted);
+    const publicKey = vault.slice(cursor,cursor+KEY_LENGTH);
+    cursor += KEY_LENGTH;
+
+    const usernameLengthArr = vault.slice(cursor,cursor+2);
+    cursor += 2;
+    const usernameLength = getUint16(usernameLengthArr);
+
+    const usernameArr = vault.slice(cursor,cursor+usernameLength);
+    const username = new TextDecoder().decode(usernameArr);
+    // console.log("decoded username is",username);
+    cursor += usernameLength;
+
+    const cipherTextLengthArr = vault.slice(cursor,cursor+2);
+    cursor += 2;
+    console.log("cipherTextLengthArr",cipherTextLengthArr);
+
+    const cipherTextLength = getUint16(cipherTextLengthArr);
+
+    // console.log("cursor",cursor,"cipherTextLength",cipherTextLength);
+    const cipherText = vault.slice(cursor,cursor+cipherTextLength-16);
+    cursor+=cipherTextLength-16;
+
+    const mac = vault.slice(cursor,cursor+MAC_LENGTH);
+
+    const additionData = concatArr(nouce,publicKey,usernameLengthArr,usernameArr,cipherTextLengthArr);
+    console.log("decrypted with",vaultKey,"nouce",nouce,"additonalData",additionData,"B",cipherText);
+    B=cipherText;
+    console.log("A and B same?",comparAB());
+
+    const decrypted = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt_detached(null,cipherText,mac,additionData,nouce,vaultKey);
+
+    const privateKey = decrypted.slice(0,cursor+KEY_LENGTH);
+
+    let out = {privateKey:privateKey,publicKey:publicKey,username:username,nouce:nouce};
+
+    return out;
+    
+}
+export function getUint16(arr){
+    console.log("getUint16 arr",arr);
+    return new DataView(arr.buffer).getUint16(0, false);
+}
+export function setUint16(num){
+    const buf = new ArrayBuffer(2);
+    new DataView(buf).setUint16(0,num,false);
+    return new Uint8Array(buf);
 }
 /**
  * psss.
@@ -188,14 +252,13 @@ export function keySchedule(baseKey){
     loaded();
     let out = {};
 
-    const vaultKey = sodium.crypto_kdf_derive_from_key(key_length,1,"vaultKey",baseKey);
+    const vaultKey = sodium.crypto_kdf_derive_from_key(KEY_LENGTH,1,"vaultKey",baseKey);
 
     out.vaultKey = vaultKey;
 
     return out;
 }
-
-function concatArr(...arrays) {
+export function concatArr(...arrays) {
   const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
   const result = new Uint8Array(totalLength);
   let offset = 0;
@@ -204,4 +267,16 @@ function concatArr(...arrays) {
     offset += arr.length;
   }  
   return result;
+}
+export function comparAB(){
+    if(A.length != B.length){
+        return false;
+    }
+    for(let i=0; i<A.length;i++){
+        if(A[i]!=B[i]){
+            console.log("a-b not same at",i,`where A[i]=${A[i]} and B[i]=${b[i]}`);
+            return false;
+        }
+    }
+    return true;
 }
