@@ -75,6 +75,14 @@ public class CreateAccount {
         try (Connection conn = dbService.getDB().getConnection()){
             initService(conn);
 
+            PreparedStatement accountExsistsQuery = conn.prepareStatement("SELECT 1 FROM user WHERE username=? LIMIT 1;");
+            accountExsistsQuery.setString(1, username);
+
+            ResultSet exisitsResults = accountExsistsQuery.executeQuery();
+            if(exisitsResults.next()){
+                return new ResponseEntity<>(Util.generateJsonError("Username is taken."),HttpStatus.OK);
+            }
+
             PreparedStatement ps = conn.prepareStatement("INSERT INTO user (username, publicKey, vault) VALUES (? ,?, ?);");
             ps.setString(1, username);
             ps.setBytes(2, publicKey);

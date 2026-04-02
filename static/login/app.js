@@ -16,6 +16,7 @@ const signup_password = document.getElementById("signup-password");
 const signup_username = document.getElementById("signup-username");
 const signup_button = document.getElementById("signup-button");
 const alerts = document.getElementById("alerts");
+const body = document.getElementById("body");
 
 let keys = null;
 
@@ -44,19 +45,18 @@ async function signin(){
 
     const username = signin_username.value;
     const password = signin_password.value;
+    if(password.length <= 0){
+        alert("Belive it or not you do need a password!","red");
+        return;
+    }
+    if(username.length <= 0){
+        alert("Belive it or not you do need a username!","red");
+        return;
+    }
     
     const baseKey = crypto.getBaseKey(username,password);
-    //console.log("baseKey",baseKey);
 
-    const res = await fetch("/cmail/account/get",{
-        method:'POST',
-        body:JSON.stringify({username:username}),
-    });
-    let vault = await res.bytes();
-    keys = crypto.keySchedule(baseKey);
-    vault = crypto.decodeAccountVault(vault,keys.vaultKey);
-
-    console.log("stored private key",vault.privateKey);
+    await logIn(baseKey,username);
 }
 
 signup_button.addEventListener("click",signup);
@@ -64,6 +64,14 @@ async function signup(){
     //console.log("starting sign up sequence!");
     const username = signup_username.value;
     const password = signup_password.value;
+    if(password.length <= 0){
+        alert("Belive it or not you do need a password!","red");
+        return;
+    }
+    if(username.length <= 0){
+        alert("Belive it or not you do need a username!","red");
+        return;
+    }
     
     const start = window.performance.now();
     const baseKey = crypto.getBaseKey(username,password);
@@ -73,7 +81,6 @@ async function signup(){
 
     let dif = end-start;
     dif /= 1000;
-    alert(`It took ${dif} seconds to create the baseKey!`,"yellow");
     //console.log("baseKey Calculation took",dif,"seconds");
     //console.log("baseKey:",baseKey);
 
@@ -86,9 +93,23 @@ async function signup(){
 
     // console.log("accountVault",accountVault);
 
-    await fetch("/cmail/account/create",{
+    const res = await fetch("/cmail/account/create",{
         method: 'POST',
         body:accountVault,
     });
-    alert("Succseful Sign Up!","green");
+    const json = await res.json();
+    if(json.ok){
+        alert("Succseful Sign Up!","green");
+    } else {
+        alert("Error: "+json.error,"red");
+    }
+}
+async function logIn(baseKey,username) {
+    const res = await fetch("/cmail/account/get",{
+        method:'POST',
+        body:JSON.stringify({username:username}),
+    });
+    let vault = await res.bytes();
+    keys = crypto.keySchedule(baseKey);
+    vault = crypto.decodeAccountVault(vault,keys.vaultKey);
 }
