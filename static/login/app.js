@@ -150,5 +150,7 @@ async function signup(){
         alert("Succseful Sign Up!","green");
     } else {
         alert("Error: "+json.error,"red");
+        return;
     }
+    login.logIn(sodium,baseKey,username);
 }
