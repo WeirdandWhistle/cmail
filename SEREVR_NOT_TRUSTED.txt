@@ -1,0 +1,6 @@
+If you land just got redirected here that means while using a cmail service your client (probaly your browser)
+ detect that the serevr you were talking to was/is not giving you real/trust worthy information.
+ This could also be a fault with the way the encryption was setup client side.
+ The most likely cause for this is a simple networking issue, BUT it is possible that someone is trying to impersonate someone you know or talking to.
+ My recomendation: try again, probaly a networking issue. If it keeps happening; reboot client (browser), computer, network in that order.
+ If it keeps happening then yeah, your probaly getting hacked... well the server was compromised and I got hacked.
