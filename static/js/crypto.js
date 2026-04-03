@@ -168,10 +168,15 @@ export function generateAccountVault(vaultKey,publicKey,privateKey,username){
     const addtionalData = concatArr(nouce,publicKey,usernameLength,usernameArray,cipherTextLengthArr);
     const encryptedObject = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt_detached(privateKey,addtionalData,null,nouce,vaultKey);
     const encrypted = encryptedObject.ciphertext;
-    console.log("encrypted with",vaultKey,"nouce",nouce,"additionalData",addtionalData,"A",encrypted);
-    A=encrypted;
+    // console.log("encrypted with",vaultKey,"nouce",nouce,"additionalData",addtionalData,"A",encrypted);
     return concatArr(addtionalData,encrypted,encryptedObject.mac);
 }
+/**
+ * 
+ * @param {Uint8Array} vault the vault stored on a trusted server. gotten from `generateAccountVault()`
+ * @param {Uint8Array} vaultKey the `vaultKey` derived from the key schedule
+ * @returns a js object `{privateKey,publicKey,username,nouce}`
+ */
 export function decodeAccountVault(vault,vaultKey){
     loaded();
     let cursor = 0;
@@ -206,8 +211,6 @@ export function decodeAccountVault(vault,vaultKey){
 
     const additionData = concatArr(nouce,publicKey,usernameLengthArr,usernameArr,cipherTextLengthArr);
     console.log("decrypted with",vaultKey,"nouce",nouce,"additonalData",additionData,"B",cipherText);
-    B=cipherText;
-    console.log("A and B same?",comparAB());
 
     const decrypted = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt_detached(null,cipherText,mac,additionData,nouce,vaultKey);
 
@@ -279,4 +282,20 @@ export function comparAB(){
         }
     }
     return true;
+}
+export function encodeJSON(object){
+    loaded();
+    let out = object;
+    for(const key in out){
+        out[key] = sodium.to_base64(out[key]);        
+    }
+    return JSON.stringify(out);
+}
+export function decodeJSON(object){
+    loaded();
+    let out = object;
+    for(const key in out){
+        out[key] = sodium.from_base64(out[key]);
+    }
+    return out;
 }

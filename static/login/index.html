@@ -30,6 +30,11 @@
         <button id="signin-button">Sign In</button>
         <hr>
         <h2>Sign up</h2>
+        <p style="color: red;">
+          WARNING: This is a browser based End-to-end encrption messaging service (the server couldn't see your message if it wanted to)
+          becuase of the way that must be setup anyone can download you vault and try to guess your password. If you dont choose a good password (at least 12 charecters)
+          then bad actor can guess your password in a matter of days. If you care about your privacy then choose a good password!
+        </p>
 
         <div class="form-group">
           <span>Handle/username:</span>
@@ -40,6 +45,7 @@
           <span>Password:</span>
           <input type="password" placeholder="password" id="signup-password">
         </div>
+        <p id="passwordComment" style="font-size: 0.85rem;"></p>
         <button id="signup-button">Sign Up</button>
         
         <div style="position: fixed; bottom: 0; right: 5px; padding: 5px; border: 1px red none; width: 500px; gap:10px;" id="alerts"></div>
@@ -47,5 +53,5 @@
 
     
   <script type="module" src="app.js"></script>
-  <script src="../sodium.js" async></script>
+  <script src="/js/sodium.js" async></script>
 </html>

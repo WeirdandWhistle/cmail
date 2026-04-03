@@ -1,4 +1,5 @@
-import * as crypto from '../crypto.js';
+import * as crypto from '/js/crypto.js';
+import * as login from "/js/login.js";
 
 let sodium;
 window.sodium = {
@@ -15,10 +16,57 @@ const signin_button = document.getElementById("signin-button");
 const signup_password = document.getElementById("signup-password");
 const signup_username = document.getElementById("signup-username");
 const signup_button = document.getElementById("signup-button");
+const password_comment =document.getElementById("passwordComment");
 const alerts = document.getElementById("alerts");
 const body = document.getElementById("body");
 
 let keys = null;
+
+signup_password.addEventListener("keyup",()=>{
+    const len = signup_password.value.length;
+    let mes = "How did you even manage this?";
+    let color = "purple";
+    if(len <= 0){
+        mes = "";
+        color="";
+    }
+    else if(len <= 4){
+        mes = "You really should NOT use a that short of a password.";
+        color="red";
+    }else if(4 < len && len <= 8){
+        mes="Your password would take a few weeks to guess.";
+        color="#FFA500";
+    } else if(6<len && len<=12){
+        mes="Pretty good, but theres still one more tier";
+        color="#00ff00";
+    } else if(12<len && len<32){
+        mes="Damm near perfect!";
+        color="#029902";
+    } else if(len == 32){
+        mes="Perfect!";
+        color="#da9100";
+    } else if(len<=33){
+        mes="Then you had to go and ruin a good thing! THANKS A LOT!";
+        color="RED";
+    } else if(len<=34){
+        mes="You dont get any more security out of this!";
+        color="grey";
+    }else if(len<=35){
+        mes="Theres no more messages after this.";
+        color="grey";
+    }else if(len<=36){
+        mes="Make me a liar!";
+        color="grey";
+    }else if(len<=37){
+        mes="Make me a liar AGAIN!";
+        color="grey";
+    }else if(true){
+        mes="nahhh for real though... i getting bored writing this";
+        color="grey";
+    }    
+    password_comment.innerText=mes;
+    password_comment.style.color=color;
+});
 
 async function main(){
     await sodium.ready;
@@ -56,7 +104,7 @@ async function signin(){
     
     const baseKey = crypto.getBaseKey(username,password);
 
-    await logIn(baseKey,username);
+    await login.logIn(crypto,baseKey,username);
 }
 
 signup_button.addEventListener("click",signup);
@@ -103,13 +151,4 @@ async function signup(){
     } else {
         alert("Error: "+json.error,"red");
     }
-}
-async function logIn(baseKey,username) {
-    const res = await fetch("/cmail/account/get",{
-        method:'POST',
-        body:JSON.stringify({username:username}),
-    });
-    let vault = await res.bytes();
-    keys = crypto.keySchedule(baseKey);
-    vault = crypto.decodeAccountVault(vault,keys.vaultKey);
 }

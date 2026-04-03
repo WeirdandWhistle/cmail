@@ -1,4 +1,5 @@
-import * as crypto from './crypto.js';
+import * as crypto from '/js/crypto.js';
+import * as login from "/js/login.js";
 
 let sodium;
 window.sodium = {
