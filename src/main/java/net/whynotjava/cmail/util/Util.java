@@ -1,5 +1,7 @@
 package net.whynotjava.cmail.util;
 
+import org.springframework.http.*;
+
 public abstract class Util {
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
     public static String bytesToHex(byte[] bytes) {
@@ -23,5 +25,13 @@ public abstract class Util {
     }
     public static String generateJsonError(String error){
         return generateJsonError(error,"");
+    }
+    public static ResponseEntity<String> generateJsonErrorRes(String error, String error_message, HttpStatus stat){
+        return new ResponseEntity<>(generateJsonError(error, error_message),stat);
+    }
+     public static ResponseEntity<String> generateJsonErrorRes(String error, String error_message){
+        return new ResponseEntity<>(generateJsonError(error, error_message),HttpStatus.INTERNAL_SERVER_ERROR);
+    } public static ResponseEntity<String> generateJsonErrorRes(String error){
+        return new ResponseEntity<>(generateJsonError(error),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
