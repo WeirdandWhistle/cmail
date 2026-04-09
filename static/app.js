@@ -11,6 +11,8 @@ window.sodium = {
 };
 
 const alerts = document.getElementById("alerts");
+const textbox = document.getElementById("textbox");
+const sendButton = document.getElementById("sendButton");
 
 async function main(){
     await sodium.ready;
@@ -19,6 +21,7 @@ async function main(){
     crypto.init(sodium);
 
     console.log("sign keypair",crypto.createEd25519Keypair());
+    alert("all tools loaded!","green");
 }
 
 let count = 1;
@@ -30,3 +33,14 @@ function alert(text,color){
 
     setTimeout(()=>{document.getElementById(`alert-${count}`).remove();},alertTime*1000);
 }
+textbox.addEventListener("keydown",(event)=>{
+    if(event.code === "Enter"){
+        if(!event.shiftKey){
+            event.preventDefault();
+            sendButton.click();
+        }
+    }
+});
+sendButton.addEventListener("click",(event)=>{
+    alert("Sending message!","green");
+});

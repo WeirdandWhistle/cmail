@@ -65,12 +65,11 @@
                 border-radius: 4px;
             }
             textbox button{
-                max-height: 100%;
-                border-radius: 50%;
+                height: 100%;
+                border-radius: 25%;
                 aspect-ratio: 1/1;
                 white-space: nowrap;
                 cursor: pointer;
-                background-color: lightblue;
             }
             message{
                 display: block;
@@ -131,8 +130,8 @@
             </message>
             </messages>
             <textbox>
-                <textarea style="width: 89%;" placeholder="Type you message here"></textarea>
-                <button>&#x27A4; Send</button>
+                <textarea id="textbox" style="width: 89%;" placeholder="Type you message here"></textarea>
+                <button id="sendButton">Send</button>
             </textbox>
         </panel>
         
