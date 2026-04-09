@@ -1,5 +1,6 @@
 const sessionStorage = window.sessionStorage;
 const TRUSTED_ERROR_URL = "https://github.com/WeirdandWhistle/cmail/blob/main/SEREVR_NOT_TRUSTED.txt";
+const BASE_REDIRECT = "/";
 
 if(sessionStorage.getItem("baseKey") === null){
     console.log("whats mathname?",window.location.pathname.split("/"));
@@ -13,6 +14,7 @@ if(sessionStorage.getItem("baseKey") === null){
 }
 
 export async function logIn(crypto,baseKey,username) {
+    console.log("Logging in...");
     const res = await fetch("/cmail/account/get",{
         method:'POST',
         body:JSON.stringify({username:username}),
@@ -28,4 +30,6 @@ export async function logIn(crypto,baseKey,username) {
     sessionStorage.setItem("baseKey",sodium.to_base64(baseKey));
     sessionStorage.setItem("keys",crypto.encodeJSON(keys));
     sessionStorage.setItem("vault",crypto.encodeJSON(vault));
+
+    window.location.pathname = BASE_REDIRECT;
 }

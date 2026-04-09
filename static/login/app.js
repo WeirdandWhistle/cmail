@@ -20,8 +20,6 @@ const password_comment =document.getElementById("passwordComment");
 const alerts = document.getElementById("alerts");
 const body = document.getElementById("body");
 
-let keys = null;
-
 signup_password.addEventListener("keyup",()=>{
     const len = signup_password.value.length;
     let mes = "How did you even manage this?";
@@ -132,7 +130,7 @@ async function signup(){
     //console.log("baseKey Calculation took",dif,"seconds");
     //console.log("baseKey:",baseKey);
 
-    keys = crypto.keySchedule(baseKey);
+    let keys = crypto.keySchedule(baseKey);
 
     const idKeys = crypto.createEd25519Keypair();
     console.log("created privateKey",idKeys.privateKey);
@@ -152,5 +150,6 @@ async function signup(){
         alert("Error: "+json.error,"red");
         return;
     }
-    login.logIn(sodium,baseKey,username);
+    alert("Logging in...","green");
+    login.logIn(crypto,baseKey,username);
 }
