@@ -57,12 +57,19 @@ public class CMail{
      * @return publicKey if sent username. username if sent publicKey. JSON if sent both (`{ok:true, publicKeyMatch:false, usernameMatch:true}`)
      */
     @GetMapping("/account/info")
-    public ResponseEntity<?> accountInfo(@RequestParam(required=false) String publicKeyBase64URL, @RequestParam(required=false) String username){
+    public ResponseEntity<String> accountInfo(@RequestParam(required=false,value="publicKey") String publicKeyBase64URL, @RequestParam(required=false) String username){
+        if(Util.isValidBase64URL(publicKeyBase64URL)){
+            return Util.generateJsonErrorRes("IllegalArgumentException", "publicKey Base64 is invalid", HttpStatus.BAD_REQUEST);
+        }
+
         try(Connection conn = dbService.getDB().getConnection()){
         if(username != null && publicKeyBase64URL == null){
             PreparedStatement ps = conn.prepareStatement("SELECT publicKey FROM user WHERE username=? LIMIT 1;");
             ps.setString(1, username);
             byte publicKey[] = ps.executeQuery().getBytes("publicKey");
+            if(publicKey == null){
+                return new ResponseEntity<>("{\"ok\":true,\"publicKey\":null}",HttpStatus.OK);
+            }
             String publicKeyBase64 = Base64.getEncoder().encodeToString(publicKey);
             return new ResponseEntity<>("{\"ok\":true,\"publicKey\":\""+publicKeyBase64+"\"}",HttpStatus.OK);
         } else if(publicKeyBase64URL != null && username == null){
@@ -91,6 +98,8 @@ public class CMail{
         }
     } catch(SQLException e){
         return Util.generateJsonErrorRes("SQLException",e.getMessage());
+    } catch(IllegalArgumentException e){
+        return Util.generateJsonErrorRes("IllegalArgumentException",e.getMessage()+" - probaly base64 wrong",HttpStatus.BAD_REQUEST);
     }
     }
 }

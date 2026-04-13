@@ -1,5 +1,7 @@
 package net.whynotjava.cmail.util;
 
+import java.util.Base64;
+
 import org.springframework.http.*;
 
 public abstract class Util {
@@ -19,6 +21,42 @@ public abstract class Util {
             chars[i]=(char)bytes[i];
         }
         return new String(chars);
+    }
+    public static void printByteArray(byte a[]){
+        System.out.print("[ ");
+        for(int i = 0;i<a.length;i++){
+            int val = (int) a[i];
+            System.out.print(val);
+            if(i != a.length-1){
+                System.out.print(", ");
+            }
+        }
+        System.out.print(" ]");
+    }
+    public static boolean isValidBase64(String base64) {
+        if (base64 == null || base64.isEmpty()) {
+            return false;
+        }
+        try {
+            Base64.getDecoder().decode(base64);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+    public static boolean isValidBase64URL(String base64) {
+        if (base64 == null || base64.isEmpty()) {
+            return false;
+        }
+        try {
+            Base64.getUrlDecoder().decode(base64);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+    public static int getCurrentTime(){
+        return (int) (System.currentTimeMillis() / 1000);
     }
     public static String generateJsonError(String error, String error_message){
         return "{\"ok\":false,\"error\":\""+error+"\",\"error_message\":\""+error_message+"\"}";

@@ -11,24 +11,18 @@ import org.springframework.util.*;
 import jakarta.servlet.http.*;
 import net.whynotjava.cmail.*;
 import net.whynotjava.cmail.util.Util;
-import tools.jackson.core.*;
 import tools.jackson.databind.*;
-import tools.jackson.databind.json.*;
+import static net.whynotjava.cmail.Constants.*;
 
 public class CreateAccount {
 
-    private Database dbService;
-
-    public static int NOUCE_LENGTH = 24;
-    public static int KEY_LENGTH = 32;
-    public static int PUBLIC_KEY_LENGTH = KEY_LENGTH;
-    public static int PRIVATE_KEY_LENGTH = KEY_LENGTH;
-    public static int MAX_VAULT_SIZE = 500;
+    private final Database dbService;
 
     public CreateAccount(Database dbService){
         this.dbService = dbService;
     }
     public static void initService(Connection conn) throws SQLException{
+        //ED25519
         conn.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS user(username TEXT, publicKey VARBINARY, vault VARBINARY);");
     }
 
@@ -43,8 +37,6 @@ public class CreateAccount {
         if (vault.length > MAX_VAULT_SIZE) {
             return new ResponseEntity<>(Util.generateJsonError("Vault is too big"),HttpStatus.CONTENT_TOO_LARGE);
         }
-
-
 
         InputStream inputStream = new ByteArrayInputStream(vault);
         DataInputStream is = new DataInputStream(inputStream);

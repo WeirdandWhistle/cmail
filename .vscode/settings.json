@@ -1,1 +1,4 @@
-{"java.validate.enable": true}
+{
+    "java.validate.enable": true,
+    "java.compile.nullAnalysis.mode": "disabled"
+}
