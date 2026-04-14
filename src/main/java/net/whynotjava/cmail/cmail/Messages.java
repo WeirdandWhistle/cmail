@@ -2,6 +2,7 @@ package net.whynotjava.cmail.cmail;
 
 import java.io.*;
 import java.sql.*;
+import java.util.Base64;
 
 import org.apache.logging.log4j.message.*;
 import org.springframework.http.*;
@@ -24,7 +25,7 @@ public class Messages {
     public void initService(Connection conn) throws SQLException{
         // keys are in ED25519 besides of course the publicKey in the payload
         conn.createStatement().executeUpdate(
-            "CREATE TABLE IF NOT EXISTS message (timestamp INT, recipientUsername TEXT, recipientPublicKey VARBINARY, payload VARBINARY);"
+            "CREATE TABLE IF NOT EXISTS messages (id INT AUTO_INCREMENT PRIMARY KEY, timestamp INT, recipientUsername TEXT, recipientPublicKey VARBINARY, payload VARBINARY);"
         );
     }
 
@@ -70,7 +71,7 @@ public class Messages {
             int currentTime = Util.getCurrentTime();
 
             ps = conn.prepareStatement(
-                "INSERT INTO message (timestamp INT, recipientUsername TEXT, recipientPublicKey VARBINARY, payload VARBINARY) VALUES (?, ?, ?, ?);"
+                "INSERT INTO messages (timestamp INT, recipientUsername TEXT, recipientPublicKey VARBINARY, payload VARBINARY) VALUES (?, ?, ?, ?);"
             );
             ps.setInt(1, currentTime);
             ps.setString(2, recipientUsername);
@@ -81,6 +82,31 @@ public class Messages {
             return Util.generateJsonErrorRes("SQLException",e.getMessage());
         }
 
+        return Util.okRes();
+    }
+    
+    public ResponseEntity<?> get(String publicKeyBase64, String username, String limit, String start, String end){
+        byte publicKey[] = null;
+        if(publicKeyBase64 != null){
+            try {
+                publicKey = Base64.getUrlDecoder().decode(publicKeyBase64);
+            } catch (IllegalArgumentException e) {
+                return Util.generateJsonErrorRes("IllegalArgumentException","publicKey is not valid json!",HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        try (Connection conn = dbService.getDB().getConnection()){
+            PreparedStatement ps
+            = conn.prepareStatement("SELECT payload FROM");
+            
+            
+            
+            
+            // PreparedStatement ps = conn.prepareStatement("SELECT payload FROM messages WHERE recipientPublicKey=?;");
+        } catch (SQLException e) {
+            return Util.generateJsonErrorRes("SQLException",e.getMessage());
+        }
+
         return null;
-    }    
+    }
 }

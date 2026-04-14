@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import org.apache.catalina.connector.*;
+import org.apache.logging.log4j.message.*;
 import org.springframework.http.*;
 
 import jakarta.servlet.http.*;
@@ -24,10 +25,13 @@ public class CMail{
     private Database dbService;
 
     private final CreateAccount accountCreator;
+    private final Messages messages;
+
 
     @Autowired
     public CMail(Database dbService){
         this.accountCreator = new CreateAccount(dbService);
+        this.messages = new Messages(dbService);
     }
 
     @RequestMapping({"","/"})
@@ -101,5 +105,14 @@ public class CMail{
     } catch(IllegalArgumentException e){
         return Util.generateJsonErrorRes("IllegalArgumentException",e.getMessage()+" - probaly base64 wrong",HttpStatus.BAD_REQUEST);
     }
+    }
+
+    @PostMapping("/message/send")
+    public ResponseEntity<?> sendMessage(HttpServletRequest req){
+        try{
+            return messages.send(req);
+        } catch(IOException e){
+            return Util.generateJsonErrorRes("IOException",e.getMessage());
+        }
     }
 }

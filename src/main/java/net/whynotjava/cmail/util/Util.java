@@ -58,6 +58,9 @@ public abstract class Util {
     public static int getCurrentTime(){
         return (int) (System.currentTimeMillis() / 1000);
     }
+    public static ResponseEntity<String> okRes(){
+        return new ResponseEntity<>("{\"ok\":true}",HttpStatus.OK);
+    }
     public static String generateJsonError(String error, String error_message){
         return "{\"ok\":false,\"error\":\""+error+"\",\"error_message\":\""+error_message+"\"}";
     }
